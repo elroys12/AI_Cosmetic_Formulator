@@ -1,0 +1,543 @@
+{
+  "info": {
+    "name": "Novel Chemicals Production API",
+    "description": "Complete API collection for Novel Chemicals Discovery System (Production Environment)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "novel-chemicals-production-collection"
+  },
+  "item": [
+    {
+      "name": "🔧 Environment Setup",
+      "item": [
+        {
+          "name": "Set Production Environment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "console.log('✅ Production Environment Set');",
+                  "console.log('Base URL:', pm.environment.get('base_url'));",
+                  "console.log('ML Service URL:', pm.environment.get('ml_service_url'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📋 Health Checks",
+      "item": [
+        {
+          "name": "Backend Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ML Service Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{ml_service_url}}/health",
+              "host": ["{{ml_service_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ML Integration Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/analyze/ml-status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze", "ml-status"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👤 Authentication",
+      "item": [
+        {
+          "name": "Register New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user_{{$timestamp}}@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"full_name\": \"Test User\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register new user and save token automatically"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.access_token) {",
+                  "  pm.environment.set('auth_token', response.access_token);",
+                  "  pm.environment.set('user_id', response.user_id);",
+                  "  console.log('✅ Token saved:', response.access_token.substring(0, 50) + '...');",
+                  "  console.log('✅ User ID saved:', response.user_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Login Existing User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"SecurePass123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with existing credentials"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.access_token) {",
+                  "  pm.environment.set('auth_token', response.access_token);",
+                  "  pm.environment.set('user_id', response.user_id);",
+                  "  console.log('✅ Token saved:', response.access_token.substring(0, 50) + '...');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🧪 Chemical Analysis (CrewAI)",
+      "item": [
+        {
+          "name": "Analyze with Prompt Only (Chatbot Mode)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Buatkan serum anti-aging untuk kulit sensitif\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze"]
+            },
+            "description": "Pure chatbot mode - natural language input"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.conversation_id) {",
+                  "  pm.environment.set('conversation_id', response.conversation_id);",
+                  "  console.log('✅ Conversation ID saved:', response.conversation_id);",
+                  "}",
+                  "console.log('⏱️ Processing time:', response.processing_time + 's');",
+                  "if (response.data) {",
+                  "  console.log('🧪 Compound:', response.data.nama_senyawa);",
+                  "  console.log('📝 Formula:', response.data.formula);",
+                  "  console.log('📊 Recommendations:', response.data.recommendations?.length || 0);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Analyze with Conversational Context",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Apa alternatif yang lebih stabil?\",\n  \"conversation_id\": \"{{conversation_id}}\",\n  \"previous_compounds\": [\"Ascorbic Acid\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze"]
+            },
+            "description": "Follow-up question with conversation context"
+          },
+          "response": []
+        },
+        {
+          "name": "Analyze Hybrid Mode (Prompt + Properties)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Cari senyawa dengan stabilitas tinggi\",\n  \"stabilitas_termal\": 90.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze"]
+            },
+            "description": "Hybrid mode with both prompt and specific properties"
+          },
+          "response": []
+        },
+        {
+          "name": "Legacy Mode (Properties Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titik_didih\": 100.0,\n  \"viskositas\": 0.89,\n  \"stabilitas_termal\": 85.5,\n  \"kelarutan\": 12.3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze"]
+            },
+            "description": "Legacy mode - numeric properties only"
+          },
+          "response": []
+        },
+        {
+          "name": "Properties Dictionary Mode",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"properties\": {\n    \"boiling_point\": 100.0,\n    \"viscosity\": 0.89,\n    \"stability\": 85.5,\n    \"solubility\": \"water_soluble\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["api", "analyze"]
+            },
+            "description": "Direct properties dictionary for advanced users"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📊 History Management",
+      "item": [
+        {
+          "name": "Get Analysis History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/history",
+              "host": ["{{base_url}}"],
+              "path": ["api", "history"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Get user's analysis history"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔬 Direct ML Service Calls",
+      "item": [
+        {
+          "name": "ML Service Analyze Endpoint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{api_key}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topic\": \"Buatkan moisturizer untuk kulit kering\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{ml_service_url}}/analyze",
+              "host": ["{{ml_service_url}}"],
+              "path": ["analyze"]
+            },
+            "description": "Direct call to ML service CrewAI endpoint"
+          },
+          "response": []
+        },
+        {
+          "name": "ML Service Predict Endpoint",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{api_key}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topic\": \"Rekomendasi bahan untuk serum brightening\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{ml_service_url}}/predict",
+              "host": ["{{ml_service_url}}"],
+              "path": ["predict"]
+            },
+            "description": "Direct call to ML service structured endpoint"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🚀 Integration Tests",
+      "item": [
+        {
+          "name": "Full Integration Test Flow",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "console.log('🚀 Starting full integration test...');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test Complete Analysis Flow",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"integration_test_{{timestamp}}@example.com\",\n  \"password\": \"TestPass123!\",\n  \"full_name\": \"Integration Test User\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register"
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "id": "timestamp",
+      "key": "timestamp",
+      "value": "{{$timestamp}}",
+      "type": "string"
+    }
+  ]
+}

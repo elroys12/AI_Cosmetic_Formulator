@@ -1,0 +1,21 @@
+﻿# Core backend
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.2
+
+# CrewAI Multi-Agent System
+crewai==0.152.0
+crewai-tools==0.55.0
+litellm==1.74.3
+
+# Google Gemini SDK
+google-genai==0.7.0
+
+# Data & similarity
+pandas==2.2.3
+numpy==2.1.3
+scikit-learn==1.5.2
+
+# Utilities
+python-dotenv==1.0.1
+setuptools>=65.5.1
