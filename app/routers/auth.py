@@ -1,11 +1,14 @@
-# app/routers/auth.py
-
 from fastapi import APIRouter, HTTPException, status
 from app.schemas.auth_schema import UserRegister, UserLogin, TokenResponse
 from app.services.auth_service import AuthService
 from app.utils.logger import get_logger
 
-router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+# ✅ CORRECT: No /api prefix
+router = APIRouter(
+    prefix="/auth",
+    tags=["Authentication"]
+)
+
 logger = get_logger(__name__)
 
 

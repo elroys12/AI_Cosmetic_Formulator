@@ -5,7 +5,7 @@ from google import genai  # ✅ CORRECT import for google-genai==0.7.0
 import json
 
 # API Key Anda yang baru
-TEST_KEY = "AIzaSyChzlsazd-Ruku0SDryo_sG9asCByR83TU"
+TEST_KEY = "AIzaSyCEWHArY_6eL0hFjrzPWnuQ80tY6axH8hk"
 
 print("🔍 Testing Gemini API Key with google.genai v0.7.0...")
 print(f"Key: {TEST_KEY[:20]}...")

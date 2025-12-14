@@ -1,5 +1,3 @@
-# app/routers/analyze.py
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.schemas.analyze_schema import AnalyzeRequest, AnalyzeResponse
 from app.services.ml_service import MLService
@@ -10,7 +8,12 @@ import httpx
 import uuid
 import time
 
-router = APIRouter(prefix="/api/analyze", tags=["Chemical Analysis"])
+# ✅ CORRECT: No /api prefix
+router = APIRouter(
+    prefix="/analyze",
+    tags=["Chemical Analysis"]
+)
+
 logger = get_logger(__name__)
 
 
@@ -46,20 +49,16 @@ async def analyze_chemical(
     
     **AUTHENTICATION:** Requires valid JWT token in Authorization header
     """
-    
     start_time = time.time()
     ml_service = MLService()
     history_service = HistoryService()
     
-    # Prepare input for ML model
     input_data = request.model_dump(exclude_none=True)
     
-    # Generate conversation ID if not exists
     conversation_id = input_data.get("conversation_id")
     if not conversation_id and request.prompt:
         conversation_id = f"conv_{uuid.uuid4().hex[:12]}"
     
-    # Call ML model
     try:
         logger.info(f"🔍 Analyzing request for user {current_user['id']}")
         logger.info(f"📝 Input data: {input_data}")
@@ -76,10 +75,8 @@ async def analyze_chemical(
             detail=f"Analysis failed: {str(e)}"
         )
     
-    # Calculate processing time
     processing_time = round(time.time() - start_time, 2)
     
-    # Save to history
     try:
         history_id = await history_service.create_history(
             user_id=current_user["id"],
@@ -103,9 +100,7 @@ async def analyze_chemical(
 
 @router.get("/health")
 async def analyze_health_check():
-    """
-    Health check for analyze endpoint
-    """
+    """Health check for analyze endpoint"""
     from app.config.settings import get_settings
     settings = get_settings()
     
@@ -126,18 +121,13 @@ async def analyze_health_check():
 
 @router.get("/ml-status")
 async def ml_service_status():
-    """
-    Check ML service connectivity
-    """
+    """Check ML service connectivity"""
     from app.config.settings import get_settings
-    from app.services.ml_service import MLService
     
     settings = get_settings()
-    ml_service = MLService()
     
     try:
         async with httpx.AsyncClient(timeout=10) as client:
-            # Test ML service health endpoint
             response = await client.get(
                 f"{settings.ML_MODEL_URL}/health",
                 headers={"X-API-Key": settings.ML_API_KEY}

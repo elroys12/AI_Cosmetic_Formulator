@@ -1,11 +1,13 @@
-# app/routers/history.py
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.schemas.history_schema import HistoryListResponse
 from app.services.history_service import HistoryService
 from app.core.dependencies import get_current_active_user
 
-router = APIRouter(prefix="/api/history", tags=["History"])
+# ✅ CORRECT: No /api prefix
+router = APIRouter(
+    prefix="/history",
+    tags=["History"]
+)
 
 
 @router.get("", response_model=HistoryListResponse)

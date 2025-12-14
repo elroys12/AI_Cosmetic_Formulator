@@ -1,9 +1,8 @@
-# app/main.py
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from contextlib import asynccontextmanager
 import os
 
 from app.config.settings import get_settings
@@ -18,35 +17,44 @@ from app.utils.logger import get_logger
 settings = get_settings()
 logger = get_logger(__name__)
 
-# Initialize FastAPI app
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info(f"🚀 STARTING {settings.APP_NAME} v{settings.APP_VERSION}")
+    logger.info(f"📊 Debug mode: {settings.DEBUG}")
+    logger.info(f"🔗 ML Service URL: {settings.ML_MODEL_URL}")
+    logger.info(f"🌐 Port: {os.getenv('PORT', '8000')}")
+    logger.info(f"🎯 Environment: {'production' if not settings.DEBUG else 'development'}")
+    
+    yield
+    
+    logger.info(f"🛑 SHUTTING DOWN {settings.APP_NAME}")
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="Backend API for Novel Chemicals Discovery Agent",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
-    openapi_url="/api/openapi.json"
+    openapi_url="/api/openapi.json",
+    lifespan=lifespan
 )
 
-# CORS Configuration - FIXED
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,  # ✅ Use property
+    allow_origins=settings.allowed_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Exception Handlers
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
 
-# Include Routers
-app.include_router(auth.router)
-app.include_router(analyze.router)
-app.include_router(history.router)
-
+# ✅ CRITICAL FIX: Add /api prefix when including routers
+app.include_router(auth.router, prefix="/api")
+app.include_router(analyze.router, prefix="/api")
+app.include_router(history.router, prefix="/api")
 
 @app.get("/")
 async def root():
@@ -60,7 +68,6 @@ async def root():
         "environment": "production" if not settings.DEBUG else "development"
     }
 
-
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint"""
@@ -73,31 +80,7 @@ async def health_check():
         "environment": "production" if not settings.DEBUG else "development"
     }
 
-
-@app.on_event("startup")
-async def startup_event():
-    """Run on application startup"""
-    logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
-    logger.info(f"Debug mode: {settings.DEBUG}")
-    logger.info(f"ML Service URL: {settings.ML_MODEL_URL}")
-    logger.info(f"Port: {os.getenv('PORT', '8000')}")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Run on application shutdown"""
-    logger.info(f"Shutting down {settings.APP_NAME}")
-
-
 if __name__ == "__main__":
     import uvicorn
-    
-    # Use Railway PORT environment variable
     port = int(os.getenv("PORT", 8000))
-    
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=settings.DEBUG
-    )
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=settings.DEBUG)
