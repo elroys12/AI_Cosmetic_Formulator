@@ -66,5 +66,4 @@ API Key ini digunakan untuk mengakses layanan **Google Generative AI (Gemini)** 
 
 ---
 
-✍️ *README ini disusun berdasarkan implementasi pada notebook proyek capstone.*
 
