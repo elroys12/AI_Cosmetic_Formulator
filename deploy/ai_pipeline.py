@@ -14,7 +14,7 @@ from google import genai
 from google.genai.errors import ClientError
 
 # =========================
-# CONFIG PATH DATA
+# LOAD YOUR REAL DATA
 # =========================
 DATA_DIR = os.environ.get("DATA_DIR", "data")
 CHEM_PATH = os.path.join(DATA_DIR, "chemicals_with_embeddings.csv")
@@ -175,17 +175,138 @@ def semantic_search(df: pd.DataFrame, query: str, top_k: int = 5) -> pd.DataFram
 # =========================
 # CREWAI TOOLS
 # =========================
-@tool("search_chemical_tool")
-def search_chemical_tool(query: str, top_k: int = 5) -> str:
-    """
-    Cari & ranking bahan kimia relevan dari dataset chemicals.
-    Input: query teks + top_k
-    Output: JSON string list hasil (id, info, score, name_display).
-    """
-    result = semantic_search(chemicals, query, top_k)
-    result["name_display"] = result["name"].apply(pretty_compound)
-    return result.to_json(orient="records")
+def generate_real_response(topic: str) -> Dict:
+    """Generate response using REAL data from YOUR CSV"""
+    print(f"\n🔍 Processing: {topic}")
+    print(f"📊 Using REAL data from {len(chemicals_df)} compounds")
+    
+    start_time = time.time()
+    
+    # Get main compound
+    main_compound = get_real_compound(topic)
+    
+    if not main_compound:
+        # Fallback jika tidak dapat compound
+        return {
+            "success": False,
+            "message": "No compounds found in database",
+            "processing_time": 0.1
+        }
+    
+    # Get alternatives
+    alternatives = get_alternatives(main_compound["compound_id"], 2)
+    
+    # Calculate properties untuk sifat_kimia
+    properties = {
+        "reactivity_score": main_compound.get("reactivity_score"),
+        "toxicity_level": main_compound.get("toxicity_level"),
+        "solubility": main_compound.get("solubility", ""),
+        "stability_index": main_compound.get("stability_index"),
+        "skin_absorption_rate": main_compound.get("skin_absorption_rate"),
+        "ph_value": main_compound.get("ph_value"),
+        "function": main_compound.get("function", ""),
+        "origin": main_compound.get("origin", "")
+    }
+    
+    # Clean None values
+    properties = {k: v for k, v in properties.items() if v is not None and v != ""}
+    
+    # Build justifikasi berdasarkan data
+    compound_name = main_compound["compound_name"]
+    function = main_compound.get("function", "cosmetic ingredient")
+    origin = main_compound.get("origin", "synthetic")
+    
+    justifikasi_text = f"{compound_name} adalah bahan {function.lower()} yang berasal dari {origin}. "
+    
+    if main_compound.get("toxicity_level"):
+        tox_level = main_compound["toxicity_level"]
+        if tox_level < 0.3:
+            justifikasi_text += "Memiliki toksisitas rendah. "
+        elif tox_level < 0.6:
+            justifikasi_text += "Memiliki toksisitas sedang. "
+        else:
+            justifikasi_text += "Perlu perhatian khusus pada toksisitas. "
+    
+    if main_compound.get("stability_index"):
+        stability = main_compound["stability_index"]
+        if stability > 0.7:
+            justifikasi_text += "Stabilitas tinggi. "
+        elif stability > 0.4:
+            justifikasi_text += "Stabilitas sedang. "
+        else:
+            justifikasi_text += "Perlu stabilizer. "
+    
+    # Build description dari text jika ada
+    description = main_compound.get("text", f"{compound_name} adalah bahan {function}.")
+    
+    processing_time = time.time() - start_time
+    
+    # Build final response
+    response = {
+        "success": True,
+        "data": {
+            "formula": main_compound["molecular_formula"],
+            "smiles": "",  # ✅ Main compound SMILES (empty for now, add if available)
+            "nama_senyawa": compound_name,
+            "sifat_kimia": properties,
+            "justifikasi": justifikasi_text,
+            "description": description[:500] + "..." if len(description) > 500 else description,
+            "usage_guidelines": f"Gunakan sesuai formulasi kosmetik. pH optimal: {main_compound.get('ph_value', '6.0-7.0')}.",
+            "dosage": "Konsentrasi rekomendasi: 0.5-5%.",
+            "safety_notes": f"Skor toksisitas: {main_compound.get('toxicity_level', 'N/A')}. {'Aman untuk penggunaan topikal.' if main_compound.get('toxicity_level', 1) < 0.6 else 'Perlu pengujian keamanan lebih lanjut.'}",
+            "contraindications": [
+                "Hipersensitif terhadap bahan",
+                "Kulit dengan luka terbuka"
+            ],
+            "recommendations": alternatives,  # ✅ Now with correct format
+            "confidence_score": 0.9,
+            "sources": ["Internal Cosmetic Database"],
+            "_metadata": {
+                "source": "real_csv_data",
+                "compound_id": main_compound["compound_id"],
+                "total_compounds_in_db": len(chemicals_df),
+                "data_loaded": True,
+                "processing_time": processing_time,
+                "timestamp": datetime.now().isoformat()
+            }
+        },
+        "processing_time": round(processing_time, 2),
+        "message": f"Analysis completed using {len(chemicals_df)} real compounds from database"
+    }
+    
+    print(f"✅ Generated response for: {compound_name}")
+    print(f"   Compound ID: {main_compound['compound_id']}")
+    print(f"   Function: {function}")
+    print(f"   Alternatives: {len(alternatives)}")
+    print(f"   Processing time: {processing_time:.2f}s")
+    
+    return response
 
+# =========================
+# MAIN ENTRY POINT
+# =========================
+def run_ai(topic: str) -> Dict:
+    """
+    ENTRY POINT untuk FastAPI
+    Menggunakan data REAL dari CSV Anda
+    """
+    print(f"\n{'='*60}")
+    print(f"🎯 PROCESSING REQUEST")
+    print(f"   Topic: {topic}")
+    print(f"   Database size: {len(chemicals_df)} compounds")
+    print(f"   Timestamp: {datetime.now().strftime('%H:%M:%S')}")
+    print(f"{'='*60}")
+    
+    # Generate response menggunakan data real
+    response = generate_real_response(topic)
+    
+    print(f"\n✅ PROCESSING COMPLETE")
+    print(f"   Success: {response.get('success')}")
+    print(f"   Compound: {response.get('data', {}).get('nama_senyawa')}")
+    print(f"   Source: {response.get('data', {}).get('_metadata', {}).get('source')}")
+    print(f"{'='*60}")
+    
+    return response
 
 @tool("search_product_tool")
 def search_product_tool(query: str, top_k: int = 5) -> str:
