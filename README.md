@@ -58,7 +58,7 @@ Pastikan Anda memiliki **Node.js (v18+)** dan **Python (v3.10+)** terinstal di s
 
 Tautan untuk mengunduh (download) dan memuat (load) model Machine Learning yang digunakan:
 
-* **Tautan Model/Dataset:** 
+* **Tautan Model/Dataset: https://colab.research.google.com/drive/1E1GejUDfO0JPaoGP4viRDwNLnuvLqhVL?usp=sharing** 
 
 ---
 
