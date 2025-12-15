@@ -3,9 +3,10 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import SuccessModal from "./SuccessModal";
 import ErrorModal from "./ErrorModal";
 import { authAPI } from "../api";
+import { BsFullscreen } from "react-icons/bs";
 
 function Register({ onSwitchToLogin, isLanding, setIsLanding }) {
-    const [username, setUsername] = useState('');
+    const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');   
@@ -24,17 +25,17 @@ function Register({ onSwitchToLogin, isLanding, setIsLanding }) {
 
     useEffect(() => {
         let newErrors = { username: '', email: '', password: '', confirmPassword: '' };
-        if (username && (username.length < 3 || username.length > 10)) newErrors.username = "Must be 3 - 10 characters";
+        if (fullName && (fullName.length < 3 || fullName.length > 10)) newErrors.username = "Must be 3 - 10 characters";
         if (email && (!email.includes('@') || !email.includes('.'))) newErrors.email = "Invalid email";
         if (password) {
             if (password.length < 8 || password.length > 72) newErrors.password = "Must be 8 - 72 characters"; 
         }
         if (confirmPassword && password !== confirmPassword) newErrors.confirmPassword = "Passwords do not match";
         setErrors(newErrors);
-    }, [username, email, password, confirmPassword]);
+    }, [fullName, email, password, confirmPassword]);
 
     const handleRegister = async () => {  
-        if (errors.username || errors.email || errors.password || errors.confirmPassword || !username || !email || !password) {
+        if (errors.username || errors.email || errors.password || errors.confirmPassword || !fullName || !email || !password) {
             setErrorMessage("Please fill in the form correctly.");
             setShowError(true); return;
         }
@@ -42,8 +43,8 @@ function Register({ onSwitchToLogin, isLanding, setIsLanding }) {
         setIsLoading(true);
 
         try {
-            await authAPI.register({username, email, password});
-            localStorage.setItem('username', username);
+            await authAPI.register({fullName, email, password});
+            localStorage.setItem('username', fullName);
             setShowSuccess(true);
             setTimeout(() => { 
                 setShowSuccess(false); 
@@ -93,7 +94,7 @@ function Register({ onSwitchToLogin, isLanding, setIsLanding }) {
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Username</label>
-                                <input type="text" placeholder=" Create your username" value={username} onChange={(e)=> setUsername(e.target.value)} style={errors.username ? {borderColor: '#ff4d4d'} : {}} />
+                                <input type="text" placeholder=" Create your username" value={fullName} onChange={(e)=> setFullName(e.target.value)} style={errors.username ? {borderColor: '#ff4d4d'} : {}} />
                                 <span className="field-error">{errors.username}</span>
                             </div>
                             <div className="form-group">

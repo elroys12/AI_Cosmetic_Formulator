@@ -87,18 +87,18 @@ api.interceptors.response.use(
 
 export const authAPI = {
     login: async (email, password) => {
-        const response = await api.post("auth/login", { email, password });
+        const response = await api.post("api/auth/login", { email, password });
         return response.data;
     },
     register: async (fullName, email, password) => {
-        const response = await api.post("auth/register", { full_name: fullName, email, password });
+        const response = await api.post("api/auth/register", { full_name: fullName, email, password });
         return response.data;
     }
 };
 
 export const dataAPI = {
     getRecommendation: async (payload) => {
-        const response = await api.post("analyze", payload);
+        const response = await api.post("api/analyze", payload);
 
         const rawData = response.data; 
 
@@ -109,7 +109,7 @@ export const dataAPI = {
         return adaptResponse(rawData);
     },
     getHistory: async () => {
-        const response = await api.get("history");
+        const response = await api.get("api/history");
         const rawHistoryList = Array.isArray(response.data) ? response.data : (response.data.data || []);
         
         return rawHistoryList.map(item => ({
@@ -119,7 +119,7 @@ export const dataAPI = {
     },
 
     deleteHistory: async (id) => {
-        const response = await api.delete(`history/${id}`);
+        const response = await api.delete(`api/history/${id}`);
         return response.data;
     }
 };
