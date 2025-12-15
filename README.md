@@ -90,8 +90,8 @@ Proyek ini membutuhkan layanan eksternal berikut yang harus dikonfigurasi di ber
 Proyek ini menggunakan kombinasi *pre-trained models* dan *LLM Agent* yang diorkestrasi.
 
 * **Tautan Model:** [https://colab.research.google.com/drive/1E1GejUDfO0JPaoGP4viRDwNLnuvLqhVL?usp=sharing](https://colab.research.google.com/drive/1E1GejUDfO0JPaoGP4viRDwNLnuvLqhVL?usp=sharing)
-* **Tautan Dataset :**https://drive.google.com/drive/folders/11nlvniiA3a1iYx7IecS7OGa4KZpH3ibm?usp=sharing*
-*    *(Dokumen ini mencakup model *similarity* atau dataset yang digunakan untuk melatih atau memvalidasi Agent.)*
+* **Tautan Model:** https://drive.google.com/drive/folders/11nlvniiA3a1iYx7IecS7OGa4KZpH3ibm?usp=sharing
+  *(Dokumen ini mencakup model *similarity* atau dataset yang digunakan untuk melatih atau memvalidasi Agent.)*
 * **Catatan LLM Agent:** Proyek ini tidak menggunakan model *Machine Learning lokal* yang di-*serve*. Seluruh proses inferensi untuk rekomendasi dan analisis keamanan dilakukan secara *real-time* melalui **API LLM (Google Generative AI/Gemini)** yang diatur oleh *workflow* CrewAI.
 
 ---
