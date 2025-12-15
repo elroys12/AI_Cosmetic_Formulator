@@ -43,7 +43,7 @@ function Register({ onSwitchToLogin, isLanding, setIsLanding }) {
         setIsLoading(true);
 
         try {
-            await authAPI.register({fullName, email, password});
+            await authAPI.register(fullName, email, password);
             localStorage.setItem('username', fullName);
             setShowSuccess(true);
             setTimeout(() => { 
