@@ -8,7 +8,7 @@ Repositori untuk proyek Capstone AC-04 yang mengintegrasikan Front-End (React/Vi
 
 **Sistem Cerdas untuk Analisis Keamanan dan Formulasi Skincare**
 
-Novel Chemicals Discovery Agent adalah sistem berbasis kecerdasan buatan yang dirancang untuk membantu pengguna menemukan dan memformulasikan senyawa kimia yang tepat untuk kebutuhan kosmetik atau farmasi spesifik. Sistem ini menggunakan **Agentic AI** (diorkestrasi melalui CrewAI dan Google Gemini) untuk menganalisis input, melakukan pencarian kontekstual terhadap bahan aktif, dan memverifikasi keamanan (toksisitas, kompatibilitas) sebelum menghasilkan rekomendasi formulasi.
+Novel Chemicals Discovery Agent merupakan sistem berbasis AI yang dikembangkan untuk membantu penemuan dan formulasi senyawa kimia khusus di sektor farmasi serta kosmetik. Memanfaatkan teknologi **Agentic AI** yang diorkestrasi melalui CrewAI dan Google Gemini, sistem ini bekerja secara otomatis mulai dari analisis input, riset bahan aktif yang relevan, hingga verifikasi aspek keamanan serta kompatibilitas bahan guna menghasilkan rekomendasi formulasi yang akurat.
 
 Melalui *pipeline* ini, sistem dapat membantu pengguna dalam:
 
