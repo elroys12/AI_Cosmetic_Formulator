@@ -1,4 +1,4 @@
-# 🚀 Novel Chemicals Discovery Agent
+# 🚀 AI Cosmetic Formulator
 
 Repositori untuk proyek Capstone AC-04 yang mengintegrasikan Front-End (React/Vite), Back-End (FastAPI), dan AI/ML (Agentic AI) untuk merekomendasikan formulasi kimia novel berdasarkan kebutuhan pengguna.
 
